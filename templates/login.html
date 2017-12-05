@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>项目一</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+    <link rel="stylesheet" href="/static/blog/bootstrap-login-forms/form-2/assets/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/blog/bootstrap-login-forms/form-2/assets/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/blog/bootstrap-login-forms/form-2/assets/css/form-elements.css">
+    <link rel="stylesheet" href="/static/blog/bootstrap-login-forms/form-2/assets/css/style.css">
+
+    <!-- Favicon and touch icons -->
+    <link rel="shortcut icon" href="/static/blog/bootstrap-login-forms/form-2/assets/ico/favicon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144"
+          href="/static/blog/bootstrap-login-forms/form-2/assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114"
+          href="/static/blog/bootstrap-login-forms/form-2/assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72"
+          href="/static/blog/bootstrap-login-forms/form-2/assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed"
+          href="/static/blog/bootstrap-login-forms/form-2/assets/ico/apple-touch-icon-57-precomposed.png">
+    <style>
+        * {
+            color: #222222;
+        {#                background-color: #ffffff;#}
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Top content -->
+{#        <div class="top-content">#}
+
+<div class="inner-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2 text">
+                {#                            <h1><strong>登录</strong></h1>#}
+                <div class="description">
+                    <div class="pri_ava">
+                        <p><a href="/index/"><img width="150" height="150" src="/media/avatar/me3_ava.png" alt=""
+                                                  class="img-circle pri_icon"></a>
+                        </p>
+                        <h1><span class="text-info">CODER HOME</span></h1>
+                        <div><span>the dog'ming is not important</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+
+                    <div class="form-bottom">
+                        {#			                    <form role="form" action="/login/" method="post" class="login-form">#}
+                        {% csrf_token %}
+                        <div class="form-group">
+
+                            <label class="sr-only" for="form-username">Username</label>
+                            <input type="text" name="user" placeholder="Username..." class="form-username form-control"
+                                   id="form-username">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only" for="form-password">Password</label>
+                            <input type="password" name="pwd" placeholder="Password..."
+                                   class="form-password form-control" id="form-password">
+                        </div>
+                        <div class="row validCode">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" name="validCode" placeholder="ValidCode..."
+                                           class="validCode_text form-control" id="validCode">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <img class="validCode_img" src="/get_validCode_img/" alt="" width="150px" height="50px">
+                            </div>
+                        </div>
+                        <button type="button" class="btn" id="login_btn" style="width: 100%">登录 !</button>
+                        <h5 style=" color: #a94442;"><span class="login_error"></span></h5>
+                        <a href="/reg/">
+                            <button type="button" id="reg" class="btn" style="width: 100%">注册 !</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 social-login">
+                    <h3 style="color: salmon">...or login with:</h3>
+                    <div class="social-login-buttons">
+                        <a class="btn btn-link-2" href="#">
+                            <i class="fa fa-facebook"></i> Facebook
+                        </a>
+                        <a class="btn btn-link-2" href="#">
+                            <i class="fa fa-twitter"></i> Twitter
+                        </a>
+                        <a class="btn btn-link-2" href="#">
+                            <i class="fa fa-google-plus"></i> Google Plus
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="/static/blog/jquery-3.2.1.js"></script>
+{#        <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/ujqery.cookie.js"></script>#}
+<script>
+    $('#login_btn').click(function () {
+        $.ajax({
+            url: '/login/',
+            type: 'POST',
+            {#                    headers:{"X-CSRFToken":$.cookie('csrftoken')},#}
+            data: {
+                csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+                name: $('#form-username').val(),
+                pwd: $('#form-password').val(),
+                validCode: $('#validCode').val()
+            },
+            success: function (data1) {
+                console.log('data1===',data1);
+                var data2 = JSON.parse(data1);
+                if (data2['flag']) {
+                    console.log('data===', data2);
+                    location.href = "/index/"
+                }
+                else {
+                    $('.login_error').html(data2['error_massage']).css('color', 'red')
+                }
+            }
+        })
+    });
+
+    //验证码点击刷新
+    $('.validCode_img').click(function () {
+        $('.validCode_img')[0].src += "?"
+    })
+</script>
+
+</body>
+
+</html>

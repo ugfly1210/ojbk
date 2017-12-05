@@ -1,0 +1,17 @@
+.avatar{
+    position: relative;
+    width: 65px;
+    height: 65px;
+}
+
+#avatar_img,#InputFile{
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    left: 15px;
+    top: 0;
+}
+
+#InputFile{
+    opacity: 0;
+}

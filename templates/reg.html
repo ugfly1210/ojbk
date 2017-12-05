@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/blog/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/reg.css">
+
+</head>
+<body>
+<form class="form-horizontal col-lg-offset-3" style="padding-top: 150px" method="post" >
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="inputEmail" class="col-sm-2 control-label">Email</label>
+        <div class="col-sm-4">
+            {#      <input type="email" class="form-control" id="inputEmail" placeholder="Email">#}
+            {{ form.email }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inputusername" class="col-sm-2 control-label">Username</label>
+        <div class="col-sm-4">
+{#            <input type="number" class="form-control" id="inputusername" placeholder="username">#}
+            {{ form.username }}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputnickname" class="col-sm-2 control-label">Nickname</label>
+        <div class="col-sm-4">
+{#            <input type="number" class="form-control" id="inputusername" placeholder="username">#}
+            {{ form.nickname }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="inputPassword" class="col-sm-2 control-label">Password</label>
+        <div class="col-sm-4">
+{#            <input type="password" class="form-control" id="inputPassword" placeholder="Password">#}
+            {{ form.password }}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="inputPassword2" class="col-sm-2 control-label">RePassword</label>
+        <div class="col-sm-4">
+{#            <input type="password" class="form-control" id="inputPassword2" placeholder="rePassword">#}
+            {{ form.repassword }}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="InputFile" class="col-sm-2 control-label">Avatar</label>
+        <div class="col-sm-4 avatar">
+            <img src="/static/img/default.png" alt="" id="avatar_img">
+        <input type="file" id="InputFile">
+        </div>
+        <p class="help-block">Example block-level help text here.</p>
+    </div>
+{#    <div class="form-group">#}
+{#        <div class="col-sm-offset-2 col-sm-4">#}
+{#            <div class="checkbox">#}
+{#                <label>#}
+{#                    <input type="checkbox"> Remember me#}
+{#                </label>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+            <button type="button" class="btn btn-primary">Register</button>
+        </div>
+    </div>
+</form>
+
+<script src="/static/blog/jquery-3.2.1.js"></script>
+<script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script>
+
+
+    $('.btn-primary').click(function () {
+        var formdata = new FormData();      //二进制文件要用FormData
+        formdata.append('email',$('#id_email').val());
+        formdata.append('username',$('#id_username').val());
+        formdata.append('password',$('#id_password').val());
+        formdata.append('repassword',$('#id_repassword').val());
+        formdata.append('inputnickname',$('#id_nickname').val());
+        formdata.append('avatar_img',$('#InputFile')[0].files[0]); //第一个0是jquery转dom对象,第二个0是拿到所有文件的第一个文件.
+
+        //清除错误信息
+        $('.pull-right').html('');
+        $('.pull-right').parent().removeClass('has-error');
+
+
+        $.ajax({
+            url : '/reg/',
+            type : 'POST',
+            data : formdata,
+            contentType : false,
+            processData : false,
+            headers:{"X-CSRFToken":$.cookie('csrftoken')},
+            success : function (data) {
+                var data = JSON.parse(data);
+                if (data.user){
+                    location.href('/login/')  //如果有user,说明注册成功,跳转到/login/
+                }else {
+                    console.log(data.errors);
+                    $.each(data.errors,function (i,j) {
+                        console.log(i,j);
+                        //构建一个span标签,用来存放错误信息.
+                        $span = $('<span>');
+                        $span.addClass('pull-right').css('color','red');
+                        $span.html(j[0]);
+                        $('#id_'+i).after($span).parent().addClass('has-error');
+
+                        if (i=='__all__'){
+                            $('#id_repassword').after($span)
+                        }
+                    })
+                }
+            }
+        })
+    });
+
+    //头像预览
+    $('#InputFile').change(function () { //这里用change是因为它可以进行反复的文件选择,又没必要放在本地,其实做的就是把当前的url拿过来赋给src
+        var ele_file = $(this)[0].files[0]; //拿到当前input框的选择的文件
+        var reader = new FileReader();  //创建一个reader对象
+        reader.readAsDataURL(ele_file);   //读取当前文件的url
+        reader.onload=function () {    //加载事件
+            $('#avatar_img').attr('src',this.result)  //找到img标签,把新的url放进去
+        }
+    })
+</script>
+
+</body>
+</html>

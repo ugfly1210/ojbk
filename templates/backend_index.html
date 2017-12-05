@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/blog/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <script src="/static/blog/jquery-3.2.1.js"></script>
+    <script src="/static/kindeditor/kindeditor-all-min.js"></script>
+    <script src="/static/kindeditor/kindeditor-all.js"></script>
+    <style>
+
+        .hides{
+            display: none;
+        }
+
+        .header{
+            width: 100%;
+            height: 50px;
+            background-color: lightslategrey;
+            line-height: 50px;
+        }
+
+        .header p{
+            font-size: 22px;
+            color: white;
+        }
+
+        .manageCon{
+            margin-top: 80px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <p>后台管理</p>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="leftMenu col-md-3">
+            <p><a href="">文章管理</a></p>
+            <p><a href="">标签管理</a></p>
+            <p><a href="">分类管理</a></p>
+        </div>
+        <div class="manageCon col-md-8">
+
+            {% block manageCon %}
+               <a href="/blog/backend/add_article/"><button class="btn btn-primary">添加文章</button></a>
+
+
+                <table class="table table-border table-hover">
+                     <tr>
+                         <th>标题</th>
+                         <th>评论数</th>
+                         <th>点赞数</th>
+                         <th>操作</th>
+                         <th>操作</th>
+                     </tr>
+                     {% for article in article_list %}
+                       <tr>
+                           <td>{{ article.title }}</td>
+                           <td>{{ article.comment_count }}</td>
+                           <td>{{ article.up_count }}</td>
+                           <td><button class="btn btn-info">编辑</button></td>
+                           <td><button class="btn btn-danger btn-del">删除</button></td>
+                           <div class="hides" article_id="{{ article.id }}"></div>
+                       </tr>
+                     {% endfor %}
+{#<a href="/blog/backend/edit_article/{{ article.id }}">#}
+{#    <a href="/blog/backend/del_article/{{ article.id }}">#}
+                </table>
+
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/blog/jquery-3.2.1.js"></script>
+<script>
+    var article_id = $('.hides').attr('article_id');
+    $('.btn-del').click(function () {
+        var par = $(this).parent().parent();
+        $.ajax({
+            url : '/blog/backend/del_article/'+article_id,
+            success:function (data) {
+                if (data){par.remove()}
+            }
+        })
+    })
+</script>
+
+</body>
+</html>

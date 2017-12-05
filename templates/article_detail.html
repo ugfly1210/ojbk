@@ -1,0 +1,191 @@
+{% extends 'home_site.html' %}
+
+{% block content %}
+{#        <link rel="stylesheet" href="/static/blog/bootstrap-3.3.7-dist/css/bootstrap.css">#}
+
+    <style>
+    .comment{
+        margin-left: 30px;
+    }
+    </style>
+    {% csrf_token %}
+    <div class="jumbotron">
+        <h2 style="text-align: center;color: #1b6d85">{{ obj.title }}</h2>
+        <br>
+        <h5>{{ obj.articledetail.content }}</h5>
+    </div>
+
+    <div class="art_poll_up">
+        <button id="art_up" class="fa fa-thumbs-up fa-2x btn btn-danger pull-right">Great! <span
+                id="art_up_count">{{ obj.poll_count }}</span></button>
+        {#            <span class="art_up_error"></span>#}
+    </div>
+    <div style="padding-top: 50px"><span class="label label-warning  art_up_error pull-right"></span></div>
+    {#   踩#}
+    {#<div><button class="fa fa-thumbs-down fa-2x btn btn-primary pull-right">Great! <span id="digg_count">{{ obj.poll_count }}</span></button></div>#}
+    <div class="panel panel-primary has_art_comment" style="margin-top: 20px;opacity:0.8">
+    <div class="panel-heading" style="background-color: palevioletred;"><h5 class="panel-title">已发表评论🌲(树) : </h5></div>
+    <div class="panel-body comment_tree_list">
+{#<div class="comment" >#}
+{#    <div class="content"><span>'+val+'</span>#}
+{#    </div>#}
+    </div>
+
+        <div class="panel-heading" style="background-color:#a94442;"><h5 class="panel-title">已发表评论&nbsp;&nbsp;&nbsp;:</h5></div>
+        {#        拿到当前文章的所有评论,要在文章相关的urls里面取到所有的评论,文章相关走的是article_detail视图#}
+        <div class="panel-body comment_list">
+            {% for comment in comment_list %}
+                        <div class="hides" comment_user_avr="{{ comment.user.avatar.url }}" comment_nickname=""></div>
+                <div class="comment_item">
+                    <div class="row">{# 这里放的是评论头 #}
+                        <div class="col-lg-7"><img src="{{ comment.user.avatar.url }}" alt="" height="30" width="30">
+                            <a href="/blog/{{ comment.user.nickname }}/">{{ comment.user.nickname }}</a>
+                            &nbsp;&nbsp;&nbsp;发表于&nbsp;&nbsp;&nbsp;{{ comment.create_time|date:'Y-m-d H:i:s' }}</div>
+                        <div class="pull-right"><a href="#content_area" class="reply_comment_btn"
+                                                   comment_nickname="{{ comment.user.nickname }}"
+                                                   Pid="{{ comment.id }}">回复</a>
+                            <a href="">顶它</a></div>
+                    </div>
+                        {% if comment.parent_comment_id %}
+                            <div>@<a href="/blog/{{ comment.parent_comment.user.nickname }}/">{{ comment.parent_comment.user.nickname }}</a><span>{{ comment.parent_comment.content }}</span></div>
+                        {% endif %}
+                        <div>{{ comment.content }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="panel panel-default" style="opacity:0.8">
+        <div class="panel-heading">
+            <p class="panel-title">我是&nbsp;&nbsp;<input type="text" disabled="disabled" size="20"
+                                                        value="{{ request.session.nickname }}">&nbsp;,&nbsp;我想对它说&nbsp;&nbsp;:
+            </p></div>
+        <div class="panel-body">
+            {#  <div class="well well-lg >#}
+            <p>评论内容: </p>
+            <form>
+                <p><textarea name="" id="content_area" cols="60" rows="10">说爱我...</textarea></p>
+                <input type="button" value="提交评论" class="btn btn-danger commentBtn">
+            </form>
+        </div>
+    </div>
+    <script src="/static/blog/jquery-3.2.1.js"></script>
+    <script>
+    console.log('{{ request.session.nickname }}');
+        //点赞功能实现
+        $('#art_up').click(function () {
+            alert(location.pathname)
+            $.ajax({
+                url: '/blog/poll/',
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                    {#                要知道点赞的是哪篇文章#}
+                    article_id: '{{ obj.id }}'
+                },
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    console.log(data);
+                    if (data.state) {
+                        var val = parseInt($('#art_up_count').html()) + 1;
+                        $('#art_up_count').html(val)
+                    }
+                    else if (data.repeat) {
+                        $('.art_up_error').html('请勿重复点赞').show(300).delay(2000).hide(500)
+                    }
+                }
+            })
+        });
+
+        //实现文章评论功能. 点击按钮,拿到textarea里面的值.传到后台,存进数据库
+        //我们在data里面要传的值: 要知道 是哪个人对哪篇文章发表了什么评论.
+        // 这个人就是当前登录的用户,我们可以在session里面拿.  后台传过来的obj就是文章的对象
+        // json 不能存对象
+
+        //ajax文章评论
+        $('.commentBtn').click(function () {
+            //判断评论区的开头是否以@开头(这种情况主要是针对,点了回复后,在评论框手动删除,但是数据库已经创建父id了
+            var content = $('#content_area').val();
+            //判断Pid是否有值, 如果有就是子评论,传值的时候要切掉最前面的用户名
+            if (Pid){
+                var index=content.indexOf('\n');
+                    content = content.slice(index+1)
+            }
+            $.ajax({
+                url: '/blog/comment/',
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                    Pid: Pid,
+                    article_id: {{ obj.id }},
+                    content: content
+                },
+                success: function (data) {
+
+                    console.log(data.create_time.slice(19));
+                    //在页面创建评论哦,           append() 方法在被选元素的结尾（仍然在内部）插入指定内容
+                    if (!Pid){
+                        s = '<div class="comment_item"><div class="row">{# 这里放的是评论头 #}<div class="col-lg-7"><img src="'+data.ava+'" alt="" height="30" width="30"><a href="/blog/{{ request.session.nickname }}/">{{ request.session.nickname }}</a>&nbsp;&nbsp;&nbsp;发表于&nbsp;&nbsp;&nbsp;' + data.create_time.slice(0, 19) + '</div><div class="pull-right"><a href="#content_area" class="reply_comment_btn" comment_nickname="{{ request.session.nickname }}" Pid=' + data.comment_id + '>回复</a><a href="">顶它</a></div></div><div>' + content + '</div></div>';
+                    } else{
+                        s = '<div class="comment_item"><div class="row">{# 这里放的是评论头 #}<div class="col-lg-7"><img src="'+data.ava+'" alt="" height="30" width="30"><a href="/blog/{{ request.session.nickname }}/">{{ request.session.nickname }}</a>&nbsp;&nbsp;&nbsp;发表于&nbsp;&nbsp;&nbsp;' + data.create_time.slice(0, 19) + '</div><div class="pull-right"><a href="#content_area" class="reply_comment_btn" comment_nickname="{{ request.seesion.nickname }}" Pid=' + data.comment_id + '>回复</a><a href="">顶它</a></div></div>'+'<div>@<a href="/blog/'+data.parent_comment_nickname+'/">:&nbsp;&nbsp;&nbsp;'+data.parent_comment_nickname+'</a>:&nbsp;&nbsp;&nbsp;<span>'+data.parent_comment_content+'</span></div><div>' + content + '</div></div>';
+}
+
+                    $('.comment_list').append(s);
+                    //清空评论框的内容
+                    $('#content_area').val('...')
+                }
+            })
+        });
+
+        //Pid应该有一个默认的值, 用户如果点了回复,就发送该值,如果没点 就默认为空
+        var Pid = null;
+        //Ajax实现子评论   用事件委派:因为要新创建标签,但是事件之前已经绑定, 所以用事件委派
+        $('.comment_list').on('click', '.reply_comment_btn', function () {
+            //文本框中显示父级评论的昵称 前面加@符号
+            //点击回复之后,应该是先跳转到评论框,一种方法是 : 在a标签里面,href直接写要跳转到的标签
+            //第二种方法就是, focus    前面是焦点
+            $('#content_area').focus();
+            // 回复评论,  格式 : 单独一行是@用户名, 这个用户名是当前评论的用户的用户名
+
+            //attr可以返回属性值(一个参数), 也可以设置属性(俩参数).
+            var parent_comment_nickname = $(this).attr('comment_nickname');
+            $('#content_area').val('@' + parent_comment_nickname + '\n');
+
+            //要拿到一个Pid,  传过去让后台判断是否为子评论
+            Pid = $(this).attr('Pid')
+        })
+
+        //评论树🌲
+        $.ajax({
+            url : '/blog/comment_tree/{{ obj.id }}/',
+            success:function (data) {
+                console.log(JSON.parse(data));
+                var data = JSON.parse(data);
+                var s = ShowCommentTree(data);
+                $('.comment_tree_list').append(s)
+
+            }
+        });
+
+        //展开评论🌲
+        function ShowCommentTree(comment_list) {
+            var html = '';
+            $.each(comment_list,function (i,comment_dict) {
+                var val = comment_dict['content'];
+                //给树创造标签
+                var comment_str= '<div class="comment" ><div class="content"><span>'+val+'</span></div>';
+
+                if (comment_dict['children_comment_list']){
+                    var s = ShowCommentTree(comment_dict['children_comment_list']);
+                    comment_str += s
+                }
+                comment_str += '</div>';
+                html += comment_str
+            });
+            return html
+        }
+    </script>
+
+
+
+{% endblock %}

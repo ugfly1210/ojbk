@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODER HOME🌚🌚🌚</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/normalize.css"/>
+    {#		<link rel="stylesheet" type="text/css" href="static/css/demo.css" />#}
+    <link rel="stylesheet" type="text/css" href="/static/css/icons.css"/>
+    <link rel="stylesheet" href="/static/blog/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/home_site.css">
+    <script src="/static/js/modernizr.custom.js"></script>
+    <style>
+
+
+    </style>
+</head>
+<body>
+{% load my_filters %}
+{#<div class="container" style="top: 0px;">#}
+<div class="pri_ava">
+    <p><a href="/index/"><img src="/media/avatar/me3_ava.png" alt="" class="img-circle pri_icon"></a></p>
+    <h1><span class="text-info">CODER HOME</span></h1>
+    <div><span>the dog'ming is not important</span></div>
+
+</div>
+
+
+<div class="container">
+    <div class="row">
+        <div class="archive col-md-3 " style="text-align: center">
+            <a href="{% url 'aaa' request.session.nickname %}"><img class="img-circle user_ava"
+                                                                    src="{{ current_user.avatar.url }}"></a>
+            <p>昵称&nbsp;:&nbsp;&nbsp; <b>{{ current_user.nickname }}</b></p>
+            <p>创建时间&nbsp; :&nbsp;&nbsp;{{ current_user.create_time }} </p>
+            <p>园龄&nbsp; :&nbsp;&nbsp;{{ current_user.create_time|yl }} </p>
+
+            {#             分类归档#}
+            <div class="panel panel-default">
+                <div class="panel-heading">CateGory归档</div>
+                <div class="panel-body">
+                    <ul>
+                        {% for category in category_list %}
+                            <li>
+                                <a href="/blog/{{ current_user.nickname }}/category/{{ category.1 }}">{{ category.1 }}({{ category.0 }})</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {#        标签归档#}
+            <div class="panel ">
+                <div class="panel-heading">Tag归档</div>
+                <div class="panel-body">
+                    <ul type="square">
+                        {% for tag in tag_list %}
+                            <li><a href="/blog/{{ current_user.nickname }}/tag/{{ tag.1 }}">{{ tag.1 }}({{ tag.0 }})</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">Date归档</div>
+                <div class="panel-body">
+                    <ul type="circle">
+                        {% for date in date_list %}
+                            <li>
+                                <a href="/blog/{{ current_user.nickname }}/date/{{ date.0 }}">{{ date.0 }}({{ date.1 }})</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 ">{% block content %}
+                {% for article in article_list %}
+                    <div class="jumbotron">
+{#                        <div class="row">#}
+                            <div class="title"><h3><a href="/blog/{{ article.user.nickname }}/articles/{{ article.id }}">{{ article.title }}</a></h3>
+                            </div>
+                            <h5>{{ article.summary }}</h5>
+
+                        <div class="detail_info pull-right">
+                        <h6>发表于&nbsp;&nbsp;<span>{{ article.create_time|date:'Y-m-d H:i:s' }}</span>
+                            &nbsp;&nbsp;&nbsp;评论({{ article.comment_count }})
+                            &nbsp;&nbsp;&nbsp;点赞({{ article.poll_count }})
+                            &nbsp;&nbsp;&nbsp;阅读数({{ article.read_count }})</h6></div>
+                    </div>
+                {% endfor %}{% endblock content %}</div>
+</div>
+
+
+<nav id="bt-menu" class="bt-menu">
+    <a href="#" class="bt-menu-trigger"><span>Menu</span></a>
+    <ul>
+        <li><a href="#" class="bt-icon icon-user-outline">🌚首页🌚</a></li>
+        <li><a href="#" class="bt-icon icon-sun">💃随笔💃</a></li>
+        <li><a href="#" class="bt-icon icon-windows">🎃文章🎃</a></li>
+        <li><a href="/blog/backend/" class="bt-icon icon-speaker">🤖管理🤖</a></li>
+        <li><a href="#" class="bt-icon icon-star">🌈棒🌈</a></li>
+        <li><a href="#" class="bt-icon icon-bubble">🌞棒🌞</a></li>
+    </ul>
+</nav>
+</div><!-- /container -->
+</body>
+<script src="/static/blog/jquery-3.2.1.js"></script>
+<script src="/static/js/classie.js"></script>
+<script src="/static/js/borderMenu.js"></script>
+{#    <script src="/static/blog/bootstrap-3.3.7-dist/js/bootstrap.js"></script>#}
+
+<div style="text-align:center;clear:both">
+
+</div>
+</html>

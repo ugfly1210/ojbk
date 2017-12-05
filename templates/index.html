@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/blog/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/fonts/fontawesome-webfont.ttf">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/aaa.css">
+
+    <title>CODER HOME</title>
+    <style>
+        .hides {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">CODEER HOME</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">随笔<span class="sr-only">(current)</span></a></li>
+                <li><a href="#">园子</a></li>
+                <li><a href="#">新闻</a></li>
+                <li><a href="#">博问</a></li>
+
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if request.session.user %}
+                    <li><a href="{% url 'aaa' request.session.nickname %}"><span class="glyphicon glyphicon-user"></span>{{ request.session.user }}</a></li>
+                    <li><a href="/logout/">注销</a></li>
+
+                {% else %}
+                    <li><a href="/login/">登录</a></li>
+                    <li><a href="/reg/">注册</a></li>
+                {% endif %}
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Dropdown <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">One more separated link</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    网站分类
+                </div>
+                <div class="panel-footer">
+                    {% for cate in cate_list %}
+                        <div class="panel panel-default">
+                            <div class="panel-body cate_title">{{ cate.name }}</div>
+
+                            {#                                上面的大类,大类里面要套小类,参照博客园.#}
+                            {#                                    我们要先拿到大类对不对.小类默认隐藏起来#}
+                            <div class="panel-footer hides">
+                                {% for i in cate.sitearticlecategory_set.all %}
+                                    <p><a href="/cate/{{ i.name }}">{{ i.name }}</a></p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+
+            <div class="article_list">
+                {% for article in article_list %}
+                    <div class="article_item">
+                        <div class="title"><a href="">{{ article.title }}</a></div>
+                        {#                    标题写完了,现在下面应该是头像和文章概览#}
+                        <div class="row">
+                            <div class="col-md-2 avatar">
+                                {#                            <img src="/media/avatar/default.png" alt="" width="60" height="60">#}
+                                {#                            <img src="/media/{{ article.user.avatar }}" alt="" width="60" height="60">#}
+                                <a href="{% url 'aaa' article.user.nickname %}"><img src="{{ article.user.avatar.url }}" alt="" width="60" height="60"></a>
+                            </div>
+                            <div class="col-md-10">
+                                <p>{{ article.summary }}</p>
+                            </div>
+                        </div>
+                        <div class="row pub_info">
+                            <a href="">{{ article.user.nickname }}</a>&nbsp;&nbsp;发布于
+                            &nbsp;&nbsp;{{ article.create_time|date:'Y-m-d H:i:s' }}&nbsp;&nbsp;&nbsp;
+                            <a href=""><i class="fa fa-themeisle"></i>评论1{{ article.comment_count }}</a>&nbsp;&nbsp;&nbsp;
+                            <a href=""><span class="fa fa-volume-control-phone"></span>点赞{{ article.poll_count }}</a>
+                        </div>
+                    </div>
+                    <hr>
+                {% endfor %}
+
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-info">
+                <div class="panel-body">
+                    Panel content
+                </div>
+                <div class="panel-footer">Panel footer</div>
+            </div>
+            <div class="panel panel-warning">
+                <div class="panel-body">
+                    Panel content
+                </div>
+                <div class="panel-footer">Panel footer</div>
+            </div>
+            <div class="panel panel-success">
+                <div class="panel-body">
+                    Panel content
+                </div>
+                <div class="panel-footer">Panel footer</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{#写到标签淡入淡出 #}
+<script src="/static/blog/jquery-3.2.1.js"></script>
+<script>
+    $('.cate_title').mouseover(function () {
+        $(this).next().slideDown(100)
+    }).parent().mouseleave(function () {
+        $(this).children('.panel-footer').slideUp(100)
+    })
+</script>
+
+</body>
+</html>

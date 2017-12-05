@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .like{ font-size:66px;  color:#ccc; cursor:pointer;}
+        .cs{color:#f00;}
+    </style>
+</head>
+<body>
+<p class="like">&#10084;</p>
+    <i class="fa fa-thumbs-up"></i> Great!
+
+
+{#<script typet="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>#}
+    <script>
+        $(function () {
+            $(".like").click(function () {
+                $(this).toggleClass('cs');
+            })
+        })
+    </script>
+</body>
+</html>

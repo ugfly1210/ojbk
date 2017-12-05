@@ -1,0 +1,18 @@
+.pri_icon {
+    height: 66px;
+    width: 66px;
+}
+
+* {
+    font-family: "Comic Sans MS", "Lantinghei SC";
+}
+
+.pri_ava {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.user_ava {
+    height: 50px;
+    width: 50px;
+}

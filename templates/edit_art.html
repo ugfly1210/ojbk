@@ -1,0 +1,34 @@
+{% extends 'backend_index.html' %}
+{% block manageCon %}
+
+    <h3>编辑文章</h3>
+
+
+
+    <form method="post" novalidate>
+    {% csrf_token %}
+        {{ form.title }}
+        {{ form.content }}
+
+        <input type="submit" value="提交">
+    </form>
+
+    <script>
+
+
+    KindEditor.ready(function(K) {
+                window.editor = K.create('#id_content',{
+                        width:"600px",
+                        height:"500px",
+                        resizeType:0,
+                        uploadJson:"/uploadFile/",
+                        extraFileUploadParams:{
+                            csrfmiddlewaretoken:$("[name='csrfmiddlewaretoken']").val(),
+                       }
+
+                });
+
+     })
+    </script>
+
+{% endblock manageCon %}
